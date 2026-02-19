@@ -1,6 +1,28 @@
-﻿@{
-    Mascota mascota = ViewData["MASCOTA"] as Mascota;
+﻿@using MvcCoreSession.Helpers
+@using MvcCoreSession.Extensions
+@model List<Mascota>
+@{
+    byte[] data =
+            Context.Session.Get("MASCOTA");
+    Mascota mascota = null;
+    if(Context.Session.Get("MASCOTA")!= null)
+    {
+        mascota = (Mascota)MvcCoreSession.Helpers.HerlperBinarySession.ByteToObject(data);
+    }
 }
+@{
+    string data2 = Context.Session.GetString("MASCOTAJSON");
+
+            Mascota mascotaJson = null;
+    if (Context.Session.Get("MASCOTAJSON") != null)
+    {
+        mascota = (Mascota)MvcCoreSession.Helpers.HelperJsonSession.DeserializeObject<Mascota>(data2);
+    }
+}
+@{
+    Mascota fujur = Context.Session.GetObject<Mascota>("MASCOTAGENERIC");
+}
+
 
 <h1>Ejemplos Session</h1>
 
@@ -16,6 +38,21 @@
     <h4 style="color:rebeccapurple">@mascota.Raza</h4>
     <h4 style="color:rebeccapurple">@mascota.Edad</h4>
 }
+@if(mascotaJson != null)
+{
+<h2 style="color:indigo">
+    Mascota Json Nombre: @mascotaJson.Nombre
+    Mascota Json Raza: @mascotaJson.Raza
+    Mascota Json Edad: @mascotaJson.Edad
+    
+</h2>
+}
+@if(fujur != null)
+{
+    <h2>
+        MASCOTA GENERIC: @fujur.Nombre, @fujur.Raza, @fujur.Edad
+    </h2>
+}
 
 <ul class="list-group">
     <li class="list-group-item">
@@ -27,4 +64,56 @@
     <li class="list-group-item">
         <a asp-controller="EjemploSession" asp-action="SessionMascotaCollectionBytes">Session Mascota Collection Bytes</a>
     </li>
+    <li class="list-group-item">
+        <a asp-controller="EjemploSession" asp-action="SessionMascotaJson">Session Mascota Json</a>
+    </li>
+    <li class="list-group-item">
+        <a asp-controller="EjemploSession" asp-action="SessionMascotaGeneric">Session Mascota Generic</a>
+    </li>
+    <li class="list-group-item">
+        <a asp-controller="EjemploSession" asp-action="SessionMascotaListGeneric">Session Mascota List Generic</a>
+    </li>
 </ul>
+
+@if (Model != null)
+{
+
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    Nombre
+                </th>
+                <th>
+                    Raza
+                </th>
+                <th>
+                    Edad
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @item.Nombre
+                    </td>
+                    <td>
+                        @item.Raza
+                    </td>
+                    <td>
+                        @item.Edad
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                        @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                        @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
